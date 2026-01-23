@@ -46,7 +46,7 @@ async function logout() {
             <p class="text-white-75 font-weight-bold">
               <strong>간편하게 가입하고, 나만을 위한 추천레시피도 받아볼 수 있어요</strong>
             </p>
-            <RouterLink class="btn btn-success btn-xl" to="/categories">그냥 이용할래요!</RouterLink>
+            <RouterLink class="btn btn-success btn-xl" to="/diseases">그냥 이용할래요!</RouterLink>
             <RouterLink class="btn btn-success btn-xl" to="/users/login">로그인하기</RouterLink>
             <br />
             <strong>

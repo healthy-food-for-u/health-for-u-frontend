@@ -24,7 +24,7 @@ async function login() {
     // 로그인 성공 시 Pinia 상태 즉시 갱신
     userStore.user = res.data.user
     console.log("userStore : ", userStore.user)
-    await router.push('/categories')
+    await router.push('/diseases')
   } else {
     alert('아이디 또는 비밀번호가 맞지 않습니다.')
   }

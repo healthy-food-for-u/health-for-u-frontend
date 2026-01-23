@@ -32,7 +32,7 @@ function toggleFavorites() {
   <nav class="navbar">
     <div class="container">
       <img src="./src/assets/img/logoo.png" class="logo" />
-      <RouterLink class="navbar-brand" to="/categories">Healthy Food For U</RouterLink>
+      <RouterLink class="navbar-brand" to="/diseases">Healthy Food For U</RouterLink>
 
       <div class="nav-right">
         <template v-if="userStore.user">

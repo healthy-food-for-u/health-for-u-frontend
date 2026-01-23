@@ -30,7 +30,7 @@ const router = createRouter({
             component: RecipeDetail
         },
         {
-            path: '/categories',
+            path: '/diseases',
             name: 'CategorySelect',
             component: CategorySelect
         },

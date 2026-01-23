@@ -25,47 +25,43 @@ const visiblePages = computed(() => {
 const hasNextGroup = computed(() => currentStartPage.value * 20 < totalCount.value)
 
 async function fetchDiseaseData() {
-  console.log("route.params : ", route.params)
-  const id = route.params.diseaseId
-  if (!id) {
-    console.error("Error: diseaseId is missing from route parameters.")
-    return // ID가 없으면 API 호출 방지
+  const id = route.params.diseaseId;
+  if (!id) return;
+
+  try {
+    const res = await axios.get(`/api/diseases/${id}`);
+    // 백엔드에서 공통 래퍼(CommonResponse 등)를 쓰지 않는다면 res.data가 바로 DTO입니다.
+    disease.value = res.data;
+    console.log("받아온 질병 상세 정보:", disease.value);
+  } catch (err) {
+    console.error("질병 정보 조회 실패:", err);
   }
-  const res = await axios.get(`/api/diseases/${id}`)
-  disease.value = res.data.data
-  console.log("disease.value : ", disease.value)
 }
 
 async function fetchRecipes() {
   const id = route.params.diseaseId
 
+  // 20개씩 끊어서 다음 페이지를 가져오기 위한 계산
+  const pageNumber = Math.floor(startIndex.value / 20);
+
   const params = {
-    startIndex: startIndex.value,
-    search: keyword.value
-    // 백엔드가 diseaseId를 쿼리 파라미터로 받지 않고 URL 경로에서 받는다면, 여기에 diseaseId를 추가할 필요는 없습니다.
+    diseaseId: id,
+    keyword: keyword.value,
+    page: pageNumber, // 서버의 Pageable.getPageNumber()로 전달됨
+    size: 20          // 서버의 Pageable.getPageSize()로 전달됨
   };
 
-  console.log("startIndex : ", startIndex.value )
-  console.log("keyword : ", keyword.value)
+  try {
+    const res = await axios.get('/api/recipes', { params });
 
-  try{
-    const res = await axios.get(`/api/diseases/${id}/caution-recipes`, {params})
-    const { recipes: fetchedRecipes, totalCount: fetchedTotalCount } = res.data.data
-    console.log("fetchedRecipes 배열 확인 : ", res.data.data)
+    // 중요: Spring Page 객체는 데이터를 'content'에 담아줍니다.
+    cautionRecipes.value = res.data.content;
 
-    if(Array.isArray(fetchedRecipes)){
-      cautionRecipes.value = fetchedRecipes
-
-      totalCount.value = fetchedTotalCount
-    } else {
-      cautionRecipes.value = []
-      totalCount.value = 0
-      console.error("레시피 데이터가 배열 형식이 아닙니다.")
-    }
+    // 전체 개수를 알아야 페이지네이션 버튼이 만들어집니다.
+    totalCount.value = res.data.totalElements;
   } catch (err) {
-    console.error("주의 레시피 조회 오류:", err)
+    console.error("레시피 로딩 에러:", err);
   }
-
 }
 
 function searchRecipes() {
@@ -76,6 +72,8 @@ function searchRecipes() {
 function goToPage(page) {
   startIndex.value = (page - 1) * 20
   fetchRecipes()
+  // 페이지 상단으로 스크롤
+  window.scrollTo(0, 0);
 }
 
 function handleSearchResults(recipes) {
@@ -96,14 +94,17 @@ onMounted(async () => {
       <div class="list-header">
         <div class="title_div">
           선택하신 질환은<br />
-          <span class="d_name">{{ disease.name }}</span>입니다.
+          <span class="d_name">{{ disease.diseaseName }}</span>입니다.
         </div>
       </div>
 
       <div class="caution">
-        <h2><strong>주의해야 할 음식</strong></h2>
+        <h2><strong>⚠️ 주의해야 할 음식</strong></h2>
         <hr class="divider" />
-        <div class="caution_list">{{ disease.caution }}</div>
+        <div v-if="disease.caution" class="caution_list">
+          {{ disease.caution }}
+        </div>
+        <div v-else class="text-muted">등록된 주의사항 정보가 없습니다.</div>
       </div>
 
       <!-- 검색창 -->
@@ -119,14 +120,14 @@ onMounted(async () => {
             <div
                 style="display: flex; flex-wrap: wrap; margin-left: -15px; margin-right: 30px;"
             >
-              <div v-for="recipe in cautionRecipes" :key="recipe._id"
+              <div v-for="recipe in cautionRecipes" :key="recipe.id"
 
                    style="width: 25%; padding-left: 15px; padding-right: 10px;"
                    class="mb-4"
               >
                 <div class="item">
                   <div class="card h-100">
-                    <RouterLink :to="`/recipes/${recipe._id}`">
+                    <RouterLink :to="`/recipes/${recipe.id}`">
                       <img :src="recipe.recipeThumbnail" alt="레시피 이미지" style="height:20rem;" />
                       <div class="card-body p-4">
                         <div class="text-center fw-bolder">{{ recipe.recipeName }}</div>
