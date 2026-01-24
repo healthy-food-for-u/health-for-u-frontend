@@ -3,7 +3,9 @@ import {ref, onMounted, computed, watch} from "vue";
 import axios from "axios";
 import {RouterLink, useRoute, useRouter} from "vue-router";
 import NavigationBar from "@/components/NavigationBar.vue";
+import { useUserStore } from '@/stores/user';
 
+const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 
@@ -11,7 +13,7 @@ const recipe = ref({});
 const recommended = ref([]);
 const currentUserId = ref(null);
 
-// API 호출: 레시피 상세 정보 가져오기
+// 레시피 상세 정보 가져오기
 const fetchRecipe = async (id) => {
   console.log("id : ", id);
 
@@ -46,7 +48,7 @@ const fetchRecommended = async () => {
         diseaseId: diseaseId
       }
     });
-    // 백엔드가 Page 객체를 주므로 .content를 확인
+
     recommended.value = res.data.content || [];
     console.log("추천용 목록 로드 성공:", recommended.value);
   } catch (err) {
@@ -89,26 +91,34 @@ const randomRecipe = computed(() => {
 
 // 즐겨찾기 추가
 const addFavorite = async () => {
-  if (!recipe.value.id) {
-    alert("레시피 정보가 아직 로드되지 않았습니다.");
+
+  if (!userStore.user) {
+    alert("로그인 후 이용 가능합니다.");
     return;
   }
 
-  const recipeId = recipe.value.id.toString(); // ObjectId를 문자열로 변환
-  console.log("[addFavorite] recipeId : ", recipe.value.id.toString())
+  const recipeId = recipe.value?.id?.toString();
+  if (!recipeId) {
+    alert("레시피 정보를 가져올 수 없습니다.");
+    return;
+  }
+
+  const userId = userStore.user.id
+
+  console.log("전송 데이터 확인 -> userId:", userId, "recipeId:", recipeId);
 
   try {
-    const res = await axios.post(`/api/recipes/${recipeId}/favorite`, {
+    const res = await axios.post(`/api/favorites/toggle`, null, {
+      params: {
+        userId: userId,
+        recipeId: recipeId
+      },
+      withCredentials: true
     });
-
-    console.log("[addFavorite] res.data.result : ", res.data.result )
-
-    // 백엔드 응답 처리 (로그인 필요 응답 포함)
-    alert(res.data.result === "success" ? "즐겨찾기에 추가됨" : res.data.result); // 로그인 후 이용해주세요 또는 즐겨찾기 추가 실패 메시지
-
+    alert("즐겨찾기 상태가 변경되었습니다.");
   } catch (err) {
-    console.error(err);
-    alert("즐겨찾기 추가 실패");
+    console.error("에러 발생 상세:", err);
+    alert("즐겨찾기 처리 중 오류가 발생했습니다.");
   }
 };
 

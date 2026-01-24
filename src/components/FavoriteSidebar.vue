@@ -12,7 +12,7 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 
 watch(user, async (newUser) => {
-  if (newUser) {
+  if (newUser && newUser.id) {
     await fetchFavorites(newUser.id)
   } else {
     favoriteRecipes.value = []
@@ -20,14 +20,19 @@ watch(user, async (newUser) => {
 })
 
 onMounted(async () => {
-  if (user.value) {
+  if (user.value && user.value.id) {
     await fetchFavorites(user.value.id)
   }
 })
 
-async function fetchFavorites() {
+async function fetchFavorites(userId) {
+  if (!userId) return;
+
   try {
-    const res = await axios.get(`/api/recipes/favorites`)
+    const res = await axios.get(`/api/favorites`, {
+      params: { userId: userId },
+      withCredentials: true
+    })
     console.log("즐겨찾기 res : ", res.data)
     favoriteRecipes.value = res.data
   } catch (e) {

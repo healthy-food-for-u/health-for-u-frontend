@@ -30,7 +30,6 @@ async function fetchDiseaseData() {
 
   try {
     const res = await axios.get(`/api/diseases/${id}`);
-    // 백엔드에서 공통 래퍼(CommonResponse 등)를 쓰지 않는다면 res.data가 바로 DTO입니다.
     disease.value = res.data;
     console.log("받아온 질병 상세 정보:", disease.value);
   } catch (err) {
@@ -54,10 +53,8 @@ async function fetchRecipes() {
   try {
     const res = await axios.get('/api/recipes', { params });
 
-    // 중요: Spring Page 객체는 데이터를 'content'에 담아줍니다.
     cautionRecipes.value = res.data.content;
 
-    // 전체 개수를 알아야 페이지네이션 버튼이 만들어집니다.
     totalCount.value = res.data.totalElements;
   } catch (err) {
     console.error("레시피 로딩 에러:", err);
@@ -65,6 +62,25 @@ async function fetchRecipes() {
 }
 
 function searchRecipes() {
+  // 주의 성분인지 먼저 확인
+  if (keyword.value.trim() !== '') {
+
+    const cautionData = disease.value.caution || "";
+    let isCaution = false;
+
+    if (Array.isArray(cautionData)) {
+
+      isCaution = cautionData.some(ingredient =>
+          keyword.value.includes(ingredient) || ingredient.includes(keyword.value)
+      );
+    } else if (typeof cautionData === 'string') {
+      isCaution = cautionData.includes(keyword.value.trim());
+    }
+
+    if (isCaution) {
+      alert(`⚠️ '${keyword.value}'(은)는 현재 질병에 주의해야 할 성분입니다!\n 검색 결과 내에서 주의 표시를 꼭 확인하세요.`);
+    }
+  }
   startIndex.value = 0
   fetchRecipes()
 }
@@ -74,11 +90,6 @@ function goToPage(page) {
   fetchRecipes()
   // 페이지 상단으로 스크롤
   window.scrollTo(0, 0);
-}
-
-function handleSearchResults(recipes) {
-  cautionRecipes.value = recipes
-  totalCount.value = recipes.length
 }
 
 onMounted(async () => {
@@ -109,7 +120,15 @@ onMounted(async () => {
 
       <!-- 검색창 -->
       <h1>레시피 검색</h1>
-      <RecipeSearchBox @search="handleSearchResults" />
+      <div class="search-bar">
+        <input
+            v-model="keyword"
+            type="text"
+            placeholder="레시피 이름을 입력하세요"
+            @keyup.enter="searchRecipes"
+        />
+        <button @click="searchRecipes">검색</button>
+      </div>
 
        레시피 결과
       <div class="result">
