@@ -9,8 +9,11 @@ export const useUserStore = defineStore('user', {
     actions: {
         async fetchUser() {
             try {
-                const res = await axios.get('/api/users/user')
-                this.user = res.data.user
+                const res = await axios.get('/api/users/user', {
+                    withCredentials: true
+                })
+                // 백엔드가 반환하는 JSON 구조가 { user: { ... } } 인지, { ... } 자체인지 확인
+                this.user = res.data;
             } catch {
                 this.user = null
             }

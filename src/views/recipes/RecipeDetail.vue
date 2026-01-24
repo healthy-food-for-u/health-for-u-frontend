@@ -9,19 +9,48 @@ const router = useRouter();
 
 const recipe = ref({});
 const recommended = ref([]);
+const currentUserId = ref(null);
 
 // API 호출: 레시피 상세 정보 가져오기
 const fetchRecipe = async (id) => {
-  try {
-    const res = await axios.get(`/api/recipes/${id}`);
-    recipe.value = res.data.recipe;
-    console.log("res.data : ", res.data)
+  console.log("id : ", id);
 
-    recommended.value = res.data.cautionRecipes || [];
+  const diseaseIdFromQuery = route.query.diseaseId;
+  console.log("넘겨받은 질병 ID:", diseaseIdFromQuery);
+
+  try {
+    const res = await axios.get(`/api/recipes/${id}`, {
+      params: {
+        diseaseId: diseaseIdFromQuery,
+        userId: currentUserId.value
+      }
+    });
+
+    recipe.value = res.data;
+    console.log("레시피 상세 정보:", res.data);
+
+    await fetchRecommended();
+
   } catch (err) {
-    console.error(err);
-    alert("레시피 정보를 불러오는 데 실패했습니다.");
-    recipe.value = null
+    console.error("에러 발생:", err);
+  }
+};
+
+const fetchRecommended = async () => {
+  const diseaseId = route.query.diseaseId;
+  if (!diseaseId) return;
+
+  try {
+    const res = await axios.get('/api/recipes', {
+      params: {
+        diseaseId: diseaseId
+      }
+    });
+    // 백엔드가 Page 객체를 주므로 .content를 확인
+    recommended.value = res.data.content || [];
+    console.log("추천용 목록 로드 성공:", recommended.value);
+  } catch (err) {
+    console.error("추천 목록 로드 실패:", err);
   }
 };
 
@@ -40,7 +69,6 @@ const getManualStepText = (text) => {
 };
 
 const randomRecipe = computed(() => {
-  // recommended.value는 현재 질병과 관련된 '다른' 레시피들의 목록 (배열)입니다.
   const list = recommended.value;
 
   if (!list || list.length === 0) {
@@ -49,6 +77,7 @@ const randomRecipe = computed(() => {
 
   const shuffledList = list
       .slice() // 원본 배열을 훼손하지 않기 위해 복사
+      .filter(r => r.id !== recipe.value.id)
       .sort(() => 0.5 - Math.random()); // 무작위로 정렬
 
 
@@ -60,18 +89,16 @@ const randomRecipe = computed(() => {
 
 // 즐겨찾기 추가
 const addFavorite = async () => {
-  if (!recipe.value._id) {
+  if (!recipe.value.id) {
     alert("레시피 정보가 아직 로드되지 않았습니다.");
     return;
   }
 
-  const recipeId = recipe.value._id.toString(); // ObjectId를 문자열로 변환
-  console.log("[addFavorite] recipeId : ", recipe.value._id.toString())
+  const recipeId = recipe.value.id.toString(); // ObjectId를 문자열로 변환
+  console.log("[addFavorite] recipeId : ", recipe.value.id.toString())
 
   try {
     const res = await axios.post(`/api/recipes/${recipeId}/favorite`, {
-      // 서버에서 req.params.recipeId로 ID를 이미 받으므로,
-      // 요청 본문(body)에 ID를 또 보낼 필요는 없지만, 안전을 위해 유지할 수 있음
     });
 
     console.log("[addFavorite] res.data.result : ", res.data.result )
@@ -88,7 +115,10 @@ const addFavorite = async () => {
 // 추천 레시피 이동
 const goToRecipe = (id) => {
   console.log("goToRecipe id : ", id)
-  router.push(`/recipes/${id}`);
+  router.push({
+    path: `/recipes/${id}`,
+    query: { diseaseId: route.query.diseaseId }
+  });
 };
 
 watch(
@@ -139,10 +169,10 @@ onMounted(() => {
       <section class="instructions">
         <h2>[조리 순서]</h2>
         <div class="cooking">
-          <div v-for="stepItem in recipe.manualSteps" :key="stepItem.step">
+          <div v-for="stepItem in recipe.manualSteps" :key="stepItem.stepNumber">
 
-            <span class="num">{{ getManualStepNumber(stepItem.text) }}</span>
-            {{ getManualStepText(stepItem.text) }}
+            <span class="num">{{ getManualStepNumber(stepItem.stepDescription) }}</span>
+            {{ getManualStepText(stepItem.stepDescription) }}
             <br />
 
             <img
@@ -166,9 +196,9 @@ onMounted(() => {
             <tr>
               <td
                   v-for="r in randomRecipe"
-                  :key="r._id"
+                  :key="r.id"
                   class="rmd_item"
-                  @click="goToRecipe(r._id)"
+                  @click="goToRecipe(r.id)"
               >
                 <img :src="r.recipeThumbnail" alt="추천 레시피 이미지" />
                 <br />

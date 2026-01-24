@@ -36,7 +36,7 @@ function toggleFavorites() {
 
       <div class="nav-right">
         <template v-if="userStore.user">
-          <span class="user">안녕하세요, {{ userStore.user.name }}님!</span>
+          <span class="user">안녕하세요, {{ userStore.user.userName }}님!</span>
           <button id="favorite" @click="toggleFavorites">즐겨찾기 ★</button>
           <button id="logout" @click="logout">로그아웃</button>
         </template>

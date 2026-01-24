@@ -7,18 +7,18 @@ const router = useRouter()
 
 // 회원가입 폼 데이터
 const form = reactive({
-  id: null,
-  pw1: null,
-  pw2: null,
+  loginId: null,
   userName: null,
+  password: null,
+  confirmPassword: null,
   email: null,
   mobile: null
 })
 
 const errors = reactive({
-  id: null,
-  pw1: null,
-  pw2: null,
+  loginId: null,
+  password: null,
+  confirmPassword: null,
   userName: null,
   email: null,
   mobile: null
@@ -26,35 +26,35 @@ const errors = reactive({
 
 function checkId() {
   const pattern = /^[a-zA-Z0-9_-]{5,20}$/
-  if (!form.id) {
-    errors.id = '필수 정보입니다.'
-  } else if (!pattern.test(form.id)) {
-    errors.id = '5~20자의 영문, 숫자, 특수기호(_,-)만 사용 가능합니다.'
+  if (!form.loginId) {
+    errors.loginId = '필수 정보입니다.'
+  } else if (!pattern.test(form.loginId)) {
+    errors.loginId = '5~20자의 영문, 숫자, 특수기호(_,-)만 사용 가능합니다.'
   } else {
     // 서버에 아이디 중복 확인 요청
-    axios.get(`/api/users/check-id`, { params: { id: form.id } })
+    axios.get(`/api/users/check-id`, { params: { id: form.loginId } })
         .then(res => {
-          if (res.data.exists) errors.id = '이미 사용 중인 아이디입니다.'
-          else errors.id = null
+          if (res.data.exists) errors.loginId = '이미 사용 중인 아이디입니다.'
+          else errors.loginId = null
         })
         .catch(() => {
-          errors.id = '서버 오류로 확인할 수 없습니다.'
+          errors.loginId = '서버 오류로 확인할 수 없습니다.'
         })
   }
 }
 
 function checkPw() {
-  const pattern = /^[a-zA-Z0-9~!@#$%^&*()_+|<>?:{}]{8,16}$/
-  if (!form.pw1) errors.pw1 = '필수 정보입니다.'
-  else if (!pattern.test(form.pw1))
-    errors.pw1 = '8~16자 영문, 숫자, 특수문자를 사용하세요.'
-  else errors.pw1 = null
+  const pattern = /^[a-zA-Z0-9~!@#$%^&*()_+|<>?:{}]{4,16}$/
+  if (!form.password) errors.password = '필수 정보입니다.'
+  else if (!pattern.test(form.password))
+    errors.password = '4~16자 영문, 숫자, 특수문자를 사용하세요.'
+  else errors.password = null
 }
 
 function comparePw() {
-  if (!form.pw2) errors.pw2 = '필수 정보입니다.'
-  else if (form.pw2 !== form.pw1) errors.pw2 = '비밀번호가 일치하지 않습니다.'
-  else errors.pw2 = null
+  if (!form.confirmPassword) errors.confirmPassword = '필수 정보입니다.'
+  else if (form.confirmPassword !== form.password) errors.confirmPassword = '비밀번호가 일치하지 않습니다.'
+  else errors.confirmPassword = null
 }
 
 function checkName() {
@@ -86,6 +86,7 @@ const canSignup = computed(() => {
 })
 
 async function submitForm() {
+  console.log("보내는 데이터:", JSON.stringify(form))
   if (!canSignup.value) return alert('입력값을 확인해주세요.')
 
   try {
@@ -95,12 +96,32 @@ async function submitForm() {
       await router.push('/users/login') // 회원가입 후 로그인 페이지로 이동
     }
   } catch (e) {
-    alert('회원가입 중 오류가 발생했습니다.')
+    console.log("에러 전체 객체:", e);
+
+    if (e.response && e.response.status === 400) {
+      const errorData = e.response.data;
+      console.log("백엔드 검증 실패 사유:", errorData);
+
+      // 1. 만약 배열로 온다면 첫 번째 에러 메시지를 보여줌
+      if (Array.isArray(errorData) && errorData.length > 0) {
+        alert(`입력 오류: ${errorData[0].defaultMessage}`);
+      }
+      // 2. 배열이 아니라 단일 객체로 올 경우 (백엔드 설정에 따라 다름)
+      else if (errorData.message) {
+        alert(`오류: ${errorData.message}`);
+      }
+      // 3. 그 외 알 수 없는 형식이면 그냥 실패 문구
+      else {
+        alert('입력 형식이 맞지 않습니다. 다시 확인해주세요.');
+      }
+    } else {
+      alert('회원가입 중 서버 오류가 발생했습니다.');
+    }
   }
 }
 
-watch(() => form.pw1, checkPw)
-watch(() => form.pw2, comparePw)
+watch(() => form.password, checkPw)
+watch(() => form.confirmPassword, comparePw)
 watch(() => form.email, checkEmail)
 watch(() => form.mobile, checkMobile)
 watch(() => form.userName, checkName)
@@ -125,19 +146,19 @@ watch(() => form.userName, checkName)
           <!-- ID -->
           <div>
             <h3 class="join_title">아이디</h3>
-            <input @blur="checkId" v-model="form.id" type="text" maxlength="20" placeholder="아이디 입력" />
+            <input @blur="checkId" v-model="form.loginId" type="text" maxlength="20" placeholder="아이디 입력" />
           </div>
 
           <!-- PW1 -->
           <div>
             <h3 class="join_title">비밀번호</h3>
-            <input @blur="checkPw" v-model="form.pw1" type="password" maxlength="20" placeholder="비밀번호 입력" />
+            <input @blur="checkPw" v-model="form.password" type="password" maxlength="20" placeholder="비밀번호 입력" />
           </div>
 
           <!-- PW2 -->
           <div>
             <h3 class="join_title">비밀번호 재확인</h3>
-            <input @blur="comparePw" v-model="form.pw2" type="password" maxlength="20" placeholder="비밀번호 확인" />
+            <input @blur="comparePw" v-model="form.confirmPassword" type="password" maxlength="20" placeholder="비밀번호 확인" />
           </div>
 
           <!-- NAME -->

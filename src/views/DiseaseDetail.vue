@@ -127,7 +127,7 @@ onMounted(async () => {
               >
                 <div class="item">
                   <div class="card h-100">
-                    <RouterLink :to="`/recipes/${recipe.id}`">
+                    <RouterLink :to="`/recipes/${recipe.id}?diseaseId=${disease.id}`">
                       <img :src="recipe.recipeThumbnail" alt="레시피 이미지" style="height:20rem;" />
                       <div class="card-body p-4">
                         <div class="text-center fw-bolder">{{ recipe.recipeName }}</div>

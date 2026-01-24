@@ -10,19 +10,20 @@ const userStore = useUserStore()
 const router = useRouter()
 
 const loginForm = ref({
-  id: '',
+  loginId: '',
   password: ''
 })
 
 async function login() {
   const res = await axios.post('/api/users/login', {
-    id: loginForm.value.id,
+    loginId: loginForm.value.loginId,
     password: loginForm.value.password,
   })
 
   if (res.status === 200) {
     // 로그인 성공 시 Pinia 상태 즉시 갱신
-    userStore.user = res.data.user
+    userStore.user = res.data
+    console.log("실제 받은 데이터 : ", res.data)
     console.log("userStore : ", userStore.user)
     await router.push('/diseases')
   } else {
@@ -48,7 +49,7 @@ async function login() {
               <form @submit.prevent="login">
                 <div class="form-floating mb-3">
                   <input
-                      v-model="loginForm.id"
+                      v-model="loginForm.loginId"
                       class="form-control"
                       type="text"
                       placeholder="아이디를 입력해주세요"
