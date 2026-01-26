@@ -4,6 +4,7 @@ import axios from "axios";
 import {RouterLink, useRoute, useRouter} from "vue-router";
 import NavigationBar from "@/components/NavigationBar.vue";
 import { useUserStore } from '@/stores/user';
+import api from '@/api';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -21,7 +22,7 @@ const fetchRecipe = async (id) => {
   console.log("넘겨받은 질병 ID:", diseaseIdFromQuery);
 
   try {
-    const res = await axios.get(`/api/recipes/${id}`, {
+    const res = await api.get(`/health/recipes/${id}`, {
       params: {
         diseaseId: diseaseIdFromQuery,
         userId: currentUserId.value
@@ -43,7 +44,7 @@ const fetchRecommended = async () => {
   if (!diseaseId) return;
 
   try {
-    const res = await axios.get('/api/recipes', {
+    const res = await api.get('/health/recipes', {
       params: {
         diseaseId: diseaseId
       }
@@ -108,7 +109,7 @@ const addFavorite = async () => {
   console.log("전송 데이터 확인 -> userId:", userId, "recipeId:", recipeId);
 
   try {
-    const res = await axios.post(`/api/favorites/toggle`, null, {
+    const res = await api.post(`/health/favorites/toggle`, null, {
       params: {
         userId: userId,
         recipeId: recipeId

@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import api from '@/api'
 
 const emit = defineEmits(['search'])
 
@@ -10,7 +11,7 @@ const searchKeyword = ref('')
 
 const searchRecipes = async () => {
   try {
-    const res = await axios.get(`/api/recipes?name=${encodeURIComponent(searchKeyword.value)}`)
+    const res = await axios.get(`/health/recipes?name=${encodeURIComponent(searchKeyword.value)}`)
     const recipes = res.data.recipes || []
     // 검색 결과를 부모에게 전달
     emit('search', recipes)

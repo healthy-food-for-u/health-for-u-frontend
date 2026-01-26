@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
+import api from '@/api';
 
 const categoryData = ref([]) // 카테고리 + 질병이 합쳐진 데이터
 const keyword = ref('')
@@ -13,7 +14,7 @@ onMounted(async () => {
 // 전체 카테고리 데이터 가져오기
 async function fetchData() {
   try{
-    const res = await axios.get('/api/diseases', {
+    const res = await api.get('/health/diseases', {
       params : { keyword : keyword.value }
     })
     console.log("1. 전체 응답 객체:", res);

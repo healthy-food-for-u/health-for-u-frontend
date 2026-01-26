@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/user'
+import api from '@/api'
 
 const showList = ref(false)
 const favoriteRecipes = ref([])
@@ -29,7 +30,7 @@ async function fetchFavorites(userId) {
   if (!userId) return;
 
   try {
-    const res = await axios.get(`/api/favorites`, {
+    const res = await api.get(`/health/favorites`, {
       params: { userId: userId },
       withCredentials: true
     })

@@ -4,6 +4,8 @@ import { useRouter, RouterLink } from 'vue-router'
 import axios from 'axios'
 import NavigationBar from '@/components/NavigationBar.vue'
 import { useUserStore } from '@/stores/user'
+import api from '@/api'
+
 
 const userStore = useUserStore()
 
@@ -15,7 +17,7 @@ const loginForm = ref({
 })
 
 async function login() {
-  const res = await axios.post('/api/users/login', {
+  const res = await api.post('/health/users/login', {
     loginId: loginForm.value.loginId,
     password: loginForm.value.password,
   })
@@ -25,6 +27,8 @@ async function login() {
     userStore.user = res.data
     console.log("실제 받은 데이터 : ", res.data)
     console.log("userStore : ", userStore.user)
+
+    localStorage.setItem('user', JSON.stringify(res.data));
     await router.push('/diseases')
   } else {
     alert('아이디 또는 비밀번호가 맞지 않습니다.')

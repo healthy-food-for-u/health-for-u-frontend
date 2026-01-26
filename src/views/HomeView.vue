@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import axios from 'axios'
 import NavigationBar from "@/components/NavigationBar.vue";
+import api from '@/api'
+
 
 const user = ref(null)
 
@@ -13,7 +15,7 @@ const loginForm = ref({
 
 async function login() {
   try {
-    const res = await axios.post('/api/users/login', loginForm.value)
+    const res = await axios.post('/health/users/login', loginForm.value)
     user.value = res.data
   } catch (e) {
     alert('로그인 실패')
@@ -21,7 +23,7 @@ async function login() {
 }
 
 async function logout() {
-  await axios.post('/api/users/logout')
+  await axios.post('/health/users/logout')
   user.value = null
 }
 </script>

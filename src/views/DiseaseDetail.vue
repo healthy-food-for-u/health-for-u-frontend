@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import axios from 'axios'
 import RecipeSearchBox from "@/components/RecipeSearchBox.vue";
+import api from '@/api'
 
 const route = useRoute()
 
@@ -29,7 +30,7 @@ async function fetchDiseaseData() {
   if (!id) return;
 
   try {
-    const res = await axios.get(`/api/diseases/${id}`);
+    const res = await api.get(`/health/diseases/${id}`);
     disease.value = res.data;
     console.log("받아온 질병 상세 정보:", disease.value);
   } catch (err) {
@@ -51,7 +52,7 @@ async function fetchRecipes() {
   };
 
   try {
-    const res = await axios.get('/api/recipes', { params });
+    const res = await api.get('/health/recipes', { params });
 
     cautionRecipes.value = res.data.content;
 

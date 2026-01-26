@@ -2,6 +2,7 @@
 import { reactive, computed, watch } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import api from '@/api'
 
 const router = useRouter()
 
@@ -32,7 +33,7 @@ function checkId() {
     errors.loginId = '5~20자의 영문, 숫자, 특수기호(_,-)만 사용 가능합니다.'
   } else {
     // 서버에 아이디 중복 확인 요청
-    axios.get(`/api/users/check-id`, { params: { id: form.loginId } })
+    api.get(`/health/users/check-id`, { params: { id: form.loginId } })
         .then(res => {
           if (res.data.exists) errors.loginId = '이미 사용 중인 아이디입니다.'
           else errors.loginId = null
@@ -90,7 +91,7 @@ async function submitForm() {
   if (!canSignup.value) return alert('입력값을 확인해주세요.')
 
   try {
-    const res = await axios.post('/api/users/signup', form)
+    const res = await api.post('/health/users/signup', form)
     if (res.status === 201) {
       alert('회원가입이 완료되었습니다.')
       await router.push('/users/login') // 회원가입 후 로그인 페이지로 이동

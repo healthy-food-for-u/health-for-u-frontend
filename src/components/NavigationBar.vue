@@ -10,13 +10,8 @@ const { user } = storeToRefs(userStore)
 
 const showFavorites = ref(false)
 
-onMounted(async () => {
-  try {
-    await userStore.fetchUser()
-    console.log("user value : ", user.value)
-  } catch {
-    user.value = null
-  }
+onMounted(() => {
+  console.log("현재 로그인된 유저 정보:", user.value)
 })
 
 function logout() {
