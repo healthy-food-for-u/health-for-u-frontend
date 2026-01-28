@@ -17,18 +17,27 @@ const loginForm = ref({
 })
 
 async function login() {
-  const res = await api.post('/health/users/login', {
+  const res = await api.post('/auth/login', {
     loginId: loginForm.value.loginId,
     password: loginForm.value.password,
   })
 
   if (res.status === 200) {
-    // 로그인 성공 시 Pinia 상태 즉시 갱신
-    userStore.user = res.data
-    console.log("실제 받은 데이터 : ", res.data)
-    console.log("userStore : ", userStore.user)
+    const loginData = res.data
 
-    localStorage.setItem('user', JSON.stringify(res.data));
+    // Pinia 상태 갱신
+    userStore.user = loginData
+    console.log("실제 받은 데이터 : ", loginData)
+
+    // LocalStorage 저장
+    localStorage.setItem('user', JSON.stringify(loginData));
+
+    // 토큰 저장 (변수명 일치시킴)
+    if (loginData.accessToken) {
+      localStorage.setItem('accessToken', loginData.accessToken);
+    }
+
+    // 페이지 이동
     await router.push('/diseases')
   } else {
     alert('아이디 또는 비밀번호가 맞지 않습니다.')

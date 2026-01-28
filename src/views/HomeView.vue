@@ -9,13 +9,13 @@ import api from '@/api'
 const user = ref(null)
 
 const loginForm = ref({
-  id: '',
+  loginId: '',
   password: '',
 })
 
 async function login() {
   try {
-    const res = await axios.post('/health/users/login', loginForm.value)
+    const res = await api.post('/auth/login', loginForm.value)
     user.value = res.data
   } catch (e) {
     alert('로그인 실패')
@@ -23,7 +23,7 @@ async function login() {
 }
 
 async function logout() {
-  await axios.post('/health/users/logout')
+  await api.post('/auth/logout')
   user.value = null
 }
 </script>

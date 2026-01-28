@@ -25,45 +25,10 @@ async function fetchData() {
   }
 }
 
-// 전체 질병 데이터 가져오기
-// async function fetchAllDiseases() {
-//   try{
-//     const res = await axios.get("/api/diseases")
-//
-//     const fetchedData = res.data.data;
-//     // 이제 fetchedData 배열의 각 요소는 categorySlug 필드를 포함
-//     diseases.value = Array.isArray(fetchedData) ? fetchedData : [];
-//     console.log("잘 들어왔니~ : ", diseases.value)
-//   } catch (err) {
-//     console.error("질병 목록 로드 실패:", err)
-//     diseases.value = [];
-//   }
-// }
-
 // 검색 버튼 클릭 시
 async function searchDisease() {
   await fetchData(); // 같은 함수 재사용 (keyword가 reactive하므로)
 }
-
-// 전체 질병 목록을 카테고리 Slug 기준으로 그룹화하는 계산 속성
-// const groupedDiseases = computed(() => {
-//   if (!Array.isArray(diseases.value) || diseases.value.length === 0) {
-//     return {};
-//   }
-
-//   // diseases 배열을 reduce를 사용하여 { 'slug1': [disease1, ...], 'slug2': [...] } 형태로 변환
-//   return diseases.value.reduce((groups, disease) => {
-//     // 백엔드에서 질병 문서에 categorySlug 필드를 포함하여 전송해야 함
-//     const slug = disease.categorySlug;
-//     if (slug) {
-//       if (!groups[slug]) {
-//         groups[slug] = [];
-//       }
-//       groups[slug].push(disease);
-//     }
-//     return groups;
-//   }, {});
-// });
 
 // 카테고리별 스크롤 이동
 function scrollToCategory(slug) {

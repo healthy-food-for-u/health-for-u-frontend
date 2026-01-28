@@ -7,12 +7,18 @@ const api = axios.create({
     }
 })
 
-api.interceptors.request.use(config => {
-    const token = localStorage.getItem('token'); // 로그인이 성공했을 때 저장해둔 토큰
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('accessToken');
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        } else {
+            // 토큰이 없으면 혹시 남아있을지 모를 헤더를 제거
+            delete config.headers.Authorization;
+        }
+        return config;
+    },
+);
 
 export default api;

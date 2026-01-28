@@ -91,10 +91,10 @@ async function submitForm() {
   if (!canSignup.value) return alert('입력값을 확인해주세요.')
 
   try {
-    const res = await api.post('/health/users/signup', form)
+    const res = await api.post('/auth/signup', form)
     if (res.status === 201) {
       alert('회원가입이 완료되었습니다.')
-      await router.push('/users/login') // 회원가입 후 로그인 페이지로 이동
+      await router.push('/login') // 회원가입 후 로그인 페이지로 이동
     }
   } catch (e) {
     console.log("에러 전체 객체:", e);

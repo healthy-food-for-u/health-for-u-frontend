@@ -37,8 +37,8 @@ function toggleFavorites() {
         </template>
 
         <template v-else>
-          <RouterLink class="navbar-brand" to="/users/signup">회원가입</RouterLink>
-          <RouterLink class="navbar-brand" to="/users/login">로그인</RouterLink>
+          <RouterLink class="navbar-brand" to="/auth/signup">회원가입</RouterLink>
+          <RouterLink class="navbar-brand" to="/auth/login">로그인</RouterLink>
         </template>
       </div>
 
