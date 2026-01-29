@@ -1,18 +1,20 @@
-FROM maven:3.9.6-eclipse-temurin-21-jammy AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+COPY package*.json ./
+RUN npm install
 
-COPY src ./src
+COPY . .
 
-RUN mvn clean package -DskipTests
+RUN npm run build
 
-FROM eclipse-temurin:21-jre-jammy
+FROM nginx:stable-alpine
 
-WORKDIR /app
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
