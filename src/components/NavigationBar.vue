@@ -26,7 +26,7 @@ function toggleFavorites() {
 <template>
   <nav class="navbar">
     <div class="container">
-      <img src="src/assets/img/logoo.png" class="logo" />
+      <img src="@/assets/img/logoo.png" class="logo" />
       <RouterLink class="navbar-brand" to="/diseases">Healthy Food For U</RouterLink>
 
       <div class="nav-right">
