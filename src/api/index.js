@@ -2,6 +2,9 @@ import axios from 'axios';
 
 const ec2Ip = import.meta.env.VITE_EC2_PUBLIC_IP || 'localhost';
 
+// 빌드 테스트 완료하면 삭제 예정
+console.log("ec2Ip : "+ec2Ip);
+
 const api = axios.create({
     baseURL: `http://${ec2Ip}:8080/api/v1`,
     headers: {
