@@ -1,5 +1,6 @@
 import axios from 'axios';
-const ec2Ip = import.meta.env.VITE_EC2_PUBLIC_IP || 'localhost'
+
+const ec2Ip = import.meta.env.VITE_EC2_PUBLIC_IP || 'localhost';
 
 const api = axios.create({
     baseURL: `http://${ec2Ip}:8080/api/v1`,
