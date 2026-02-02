@@ -131,58 +131,68 @@ watch(() => form.userName, checkName)
 
 <template>
   <div id="wrapper">
-    <div class="all">
+    <div class="signup-container">
       <div id="content">
         <div class="j_title">
           <RouterLink to="/">healthy food for U</RouterLink>
         </div>
 
-        <p />
-        <div class="log">
+        <div class="log-info">
           이미 회원이신가요?
-          <RouterLink class="log_link" to="/users/login">로그인하기</RouterLink>
+          <RouterLink class="log_link" to="/login">로그인하기</RouterLink>
         </div>
 
-        <form @submit.prevent="submitForm">
-          <!-- ID -->
-          <div>
+        <form @submit.prevent="submitForm" class="join_form">
+          <div class="join_row">
             <h3 class="join_title">아이디</h3>
-            <input @blur="checkId" v-model="form.loginId" type="text" maxlength="20" placeholder="아이디 입력" />
+            <div class="input_box">
+              <input @blur="checkId" v-model="form.loginId" type="text" class="int" maxlength="20" placeholder="5~20자의 영문, 숫자, 특수기호" />
+            </div>
+            <span v-if="errors.loginId" class="error_next_box">{{ errors.loginId }}</span>
           </div>
 
-          <!-- PW1 -->
-          <div>
+          <div class="join_row">
             <h3 class="join_title">비밀번호</h3>
-            <input @blur="checkPw" v-model="form.password" type="password" maxlength="20" placeholder="비밀번호 입력" />
+            <div class="input_box">
+              <input @blur="checkPw" v-model="form.password" type="password" class="int" maxlength="20" placeholder="비밀번호 입력" />
+            </div>
+            <span v-if="errors.password" class="error_next_box">{{ errors.password }}</span>
           </div>
 
-          <!-- PW2 -->
-          <div>
+          <div class="join_row">
             <h3 class="join_title">비밀번호 재확인</h3>
-            <input @blur="comparePw" v-model="form.confirmPassword" type="password" maxlength="20" placeholder="비밀번호 확인" />
+            <div class="input_box">
+              <input @blur="comparePw" v-model="form.confirmPassword" type="password" class="int" maxlength="20" placeholder="비밀번호 확인" />
+            </div>
+            <span v-if="errors.confirmPassword" class="error_next_box">{{ errors.confirmPassword }}</span>
           </div>
 
-          <!-- NAME -->
-          <div>
+          <div class="join_row">
             <h3 class="join_title">이름</h3>
-            <input @blur="checkName" v-model="form.userName" type="text" maxlength="20" placeholder="이름 입력" />
+            <div class="input_box">
+              <input @blur="checkName" v-model="form.userName" type="text" class="int" maxlength="20" placeholder="이름 입력" />
+            </div>
+            <span v-if="errors.userName" class="error_next_box">{{ errors.userName }}</span>
           </div>
 
-          <!-- EMAIL -->
-          <div>
+          <div class="join_row">
             <h3 class="join_title">이메일</h3>
-            <input @blur="checkEmail" v-model="form.email" type="text" maxlength="100" placeholder="이메일 입력" />
+            <div class="input_box">
+              <input @blur="checkEmail" v-model="form.email" type="text" class="int" maxlength="100" placeholder="이메일 입력 (example@mail.com)" />
+            </div>
+            <span v-if="errors.email" class="error_next_box">{{ errors.email }}</span>
           </div>
 
-          <!-- MOBILE -->
-          <div>
+          <div class="join_row">
             <h3 class="join_title">휴대전화</h3>
-            <input @blur="checkMobile" v-model="form.mobile" type="tel" maxlength="16" placeholder="전화번호 입력" />
+            <div class="input_box">
+              <input @blur="checkMobile" v-model="form.mobile" type="tel" class="int" maxlength="16" placeholder="'-' 제외 숫자만 입력" />
+            </div>
+            <span v-if="errors.mobile" class="error_next_box">{{ errors.mobile }}</span>
           </div>
 
-          <!-- JOIN BTN -->
           <div class="btn_area">
-            <button class="btn" type="submit" :disabled="!canSignup">가입하기</button>
+            <button class="btn_join" type="submit" :disabled="!canSignup">가입하기</button>
           </div>
         </form>
       </div>
@@ -191,5 +201,113 @@ watch(() => form.userName, checkName)
 </template>
 
 <style scoped>
-/* signup.css 가져올 예정 */
+/* 전체 컨테이너 */
+#wrapper {
+  background-color: #f5f6f7;
+  min-height: 100vh;
+  padding: 50px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.signup-container {
+  width: 460px;
+}
+
+/* 제목/로고 */
+.j_title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.j_title a {
+  font-size: 40px;
+  font-weight: bold;
+  color: #f4623a; /* 주황색 로고 */
+  text-decoration: none;
+  text-transform: lowercase;
+}
+
+.log-info {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+}
+.log_link {
+  color: #f4623a;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+/* 입력 행 */
+.join_row {
+  margin-bottom: 20px;
+}
+
+.join_title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.input_box {
+  display: block;
+  width: 100%;
+  height: 51px;
+  border: solid 1px #dadada;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  background: #fff;
+  position: relative;
+}
+
+.input_box:focus-within {
+  border: 1px solid #f4623a; /* 포커스 시 주황색 */
+}
+
+.int {
+  display: block;
+  width: 100%;
+  height: 29px;
+  border: none;
+  background: #fff;
+  font-size: 15px;
+  outline: none;
+}
+
+/* 에러 메시지 */
+.error_next_box {
+  display: block;
+  margin: 9px 0 -2px;
+  font-size: 12px;
+  line-height: 14px;
+  color: #ff0000;
+}
+
+/* 가입 버튼 */
+.btn_area {
+  margin: 30px 0 50px;
+}
+
+.btn_join {
+  width: 100%;
+  padding: 15px 0;
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+  background-color: #f4623a; /* 가입 버튼 주황색 */
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn_join:disabled {
+  background-color: #ffb5a1; /* 비활성화 시 연한 주황색 */
+  cursor: not-allowed;
+}
+
+.btn_join:hover:not(:disabled) {
+  background-color: #d45131;
+}
 </style>

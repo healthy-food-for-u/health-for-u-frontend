@@ -91,7 +91,7 @@ async function login() {
                 <p v-if="errorMsg" class="text-danger mt-3">{{ errorMsg }}</p>
 
                 <div class="mt-3 text-center">
-                  <RouterLink to="/users/signup" class="link-secondary">
+                  <RouterLink to="/auth/signup" class="link-secondary">
                     회원가입 하기
                   </RouterLink>
                 </div>

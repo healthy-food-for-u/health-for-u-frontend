@@ -101,91 +101,149 @@ onMounted(async () => {
 
 <template>
   <div id="recipe-list">
-    <Navigation />
-    <div class="all" style="padding-top: 200px">
-      <div class="list-header">
-        <div class="title_div">
-          선택하신 질환은<br />
-          <span class="d_name">{{ disease.diseaseName }}</span>입니다.
+    <header class="masthead detail-header">
+      <div class="container h-100">
+        <div class="row h-100 align-items-center justify-content-center text-center">
+          <div class="col-lg-10">
+            <h1 class="text-white font-weight-bold">
+              선택하신 질환은<br />
+              <span class="d_name text-warning">{{ disease.diseaseName }}</span>입니다.
+            </h1>
+            <hr class="divider" />
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-10 text-center">
+          <h2 class="section-title"><strong>⚠️ 주의해야 할 음식</strong></h2>
+          <hr class="divider-dark" />
+          <div class="caution-box">
+            <div v-if="disease.caution" class="caution-text">
+              {{ disease.caution }}
+            </div>
+            <div v-else class="text-muted">등록된 주의사항 정보가 없습니다.</div>
+          </div>
         </div>
       </div>
 
-      <div class="caution">
-        <h2><strong>⚠️ 주의해야 할 음식</strong></h2>
-        <hr class="divider" />
-        <div v-if="disease.caution" class="caution_list">
-          {{ disease.caution }}
-        </div>
-        <div v-else class="text-muted">등록된 주의사항 정보가 없습니다.</div>
+      <div class="search-box mb-5 mt-5">
+        <form @submit.prevent="searchRecipes" class="d-flex justify-content-center">
+          <input
+              v-model="keyword"
+              type="text"
+              class="form-control w-50"
+              placeholder="레시피 이름을 입력하세요"
+          />
+          <button type="submit" class="btn btn-primary ms-2 px-4">검색</button>
+        </form>
       </div>
+    </div>
 
-      <!-- 검색창 -->
-      <h1>레시피 검색</h1>
-      <div class="search-bar">
-        <input
-            v-model="keyword"
-            type="text"
-            placeholder="레시피 이름을 입력하세요"
-            @keyup.enter="searchRecipes"
-        />
-        <button @click="searchRecipes">검색</button>
-      </div>
-
-       레시피 결과
-      <div class="result">
-        <section>
-          <div class="rec_list">
-            <h5>총 {{ totalCount }}개의 레시피가 있습니다.</h5>
-
-            <div
-                style="display: flex; flex-wrap: wrap; margin-left: -15px; margin-right: 30px;"
-            >
-              <div v-for="recipe in cautionRecipes" :key="recipe.id"
-
-                   style="width: 25%; padding-left: 15px; padding-right: 10px;"
-                   class="mb-4"
-              >
-                <div class="item">
-                  <div class="card h-100">
-                    <RouterLink :to="`/recipes/${recipe.id}?diseaseId=${disease.id}`">
-                      <img :src="recipe.recipeThumbnail" alt="레시피 이미지" style="height:20rem;" />
-                      <div class="card-body p-4">
-                        <div class="text-center fw-bolder">{{ recipe.recipeName }}</div>
-                      </div>
-                    </RouterLink>
-                  </div>
+    <section class="recipe-results py-5">
+      <div class="container">
+        <h5 class="mb-4 fw-bold">총 {{ totalCount }}개의 레시피가 있습니다.</h5>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+          <div v-for="recipe in cautionRecipes" :key="recipe.id" class="col">
+            <div class="card h-100 border-0 shadow-sm recipe-card">
+              <RouterLink :to="`/recipes/${recipe.id}?diseaseId=${disease.id}`" class="text-decoration-none text-dark">
+                <img :src="recipe.recipeThumbnail" class="card-img-top" alt="레시피 이미지" />
+                <div class="card-body">
+                  <div class="text-center fw-bolder">{{ recipe.recipeName }}</div>
                 </div>
-              </div>
+              </RouterLink>
             </div>
           </div>
-        </section>
+        </div>
 
-        <!-- 페이지네이션 -->
-        <div class="container" style="padding-bottom:50px;">
+        <nav aria-label="Page navigation" class="mt-5">
           <ul class="pagination justify-content-center">
-
             <li v-if="currentStartPage > 1" class="page-item">
               <button class="page-link" @click="goToPage(currentStartPage - 5)">이전</button>
             </li>
-
-            <li
-                v-for="page in visiblePages"
-                :key="page"
-                :class="['page-item', { active: currentPage === page }]"
-            >
+            <li v-for="page in visiblePages" :key="page" :class="['page-item', { active: currentPage === page }]">
               <button class="page-link" @click="goToPage(page)">{{ page }}</button>
             </li>
-
             <li v-if="hasNextGroup" class="page-item">
               <button class="page-link" @click="goToPage(currentStartPage + 5)">다음</button>
             </li>
           </ul>
-        </div>
+        </nav>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
+/* 상단 헤더 배경 (1번 사진 느낌) */
+.detail-header {
+  height: 50vh !important;
+  min-height: 400px;
+  background: linear-gradient(to bottom, rgba(92, 77, 66, 0.7) 0%, rgba(92, 77, 66, 0.7) 100%),
+  url("@/assets/img/rec.jpg") !important; /* 이미지 경로 확인 필요 */
+  background-position: center !important;
+  background-size: cover !important;
+  display: flex;
+  align-items: center;
+}
 
+.d_name {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #ffc107 !important; /* 골다공증 글씨 색상 */
+}
+
+/* 주의사항 박스 디자인 (초록색 테두리) */
+.caution-box {
+  border: 2px solid #198754;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  background-color: #f8f9fa;
+}
+
+.caution-text {
+  font-size: 1.1rem;
+  color: #333;
+  word-break: keep-all;
+}
+
+/* 검색창 스타일 */
+
+.search-bar .btn {
+  border-radius: 0 50px 50px 0;
+}
+
+/* 레시피 카드 스타일 */
+.recipe-card {
+  transition: transform 0.3s;
+}
+.recipe-card:hover {
+  transform: translateY(-10px);
+}
+.recipe-card img {
+  height: 250px;
+  object-fit: cover;
+  border-radius: 5px 5px 0 0;
+}
+
+/* 구분선 */
+.divider {
+  max-width: 3.25rem;
+  border: 0.15rem solid #f4623a;
+  margin: 1.5rem auto;
+  opacity: 1;
+}
+.divider-dark {
+  max-width: 3.25rem;
+  border: 0.15rem solid #f4623a;
+  margin: 1rem auto;
+  opacity: 1;
+}
+
+.section-title {
+  color: #2c3e50;
+}
 </style>

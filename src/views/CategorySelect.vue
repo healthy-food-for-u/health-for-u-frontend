@@ -43,79 +43,98 @@ function scrollToCategory(slug) {
 </script>
 <template>
   <div id="page-top">
-    <header class="masthead">
-      <div class="container px-lg-5 h-100 text-center">
-        <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center">
-          <div class="col-lg-8 align-self-end">
-            <h1 class="text-white font-weight-bold" style="padding-top: 100%">
+    <header class="masthead disease-header">
+      <div class="container px-lg-5">
+        <div class="row gx-4 gx-lg-5 align-items-center justify-content-center text-center">
+          <div class="col-lg-8">
+            <h1 class="text-white font-weight-bold" style="margin-top: 150px;">
               <strong>질환을 선택해주세요</strong>
             </h1>
             <hr class="divider" />
+
+            <div class="search-box mb-5">
+              <form @submit.prevent="searchDisease" class="d-flex justify-content-center">
+                <input v-model="keyword" class="form-control w-50" placeholder="질환명을 입력하세요" />
+                <button type="submit" class="btn btn-primary ms-2">검색</button>
+              </form>
+            </div>
           </div>
 
-          <div>
-            <form @submit.prevent="searchDisease">
-              <input v-model="keyword" placeholder="검색어 입력" />
-              <button type="submit">검색</button>
-            </form>
-          </div>
-
-          <div class="h-icon">
-            <table>
-              <colgroup>
-                <col v-for="i in 6" :key="i" style="width:15%" />
-              </colgroup>
-              <tr>
-                <td v-for="category in categoryData" :key="category.categoryId">
-                  <a href="#" @click.prevent="scrollToCategory(category.categoryId)">
-                    <img :src="category.iconUrl" width="80%" height="80%" :alt="category.categoryName" />
-                    <br />
-                    <label style="color:black">{{ category.categoryName }}</label>
-                  </a>
-                </td>
-              </tr>
-            </table>
+          <div class="col-12 h-icon">
+            <div class="d-flex justify-content-around flex-wrap mt-4">
+              <div v-for="category in categoryData" :key="category.categoryId" class="m-3">
+                <a href="#" @click.prevent="scrollToCategory(category.categoryId)" class="text-decoration-none">
+                  <img :src="category.iconUrl" width="100" class="mb-2" :alt="category.categoryName" />
+                  <br />
+                  <label class="text-white fw-bold">{{ category.categoryName }}</label>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </header>
 
-    <div class="category">
+    <div class="category-list-container bg-white">
       <section
           v-for="category in categoryData"
-          :key="category.id"
+          :key="category.categoryId"
           :id="`category-${category.categoryId}`"
+          class="py-5 border-bottom"
       >
-        <h1 class="c_title"><strong>{{ category.categoryName }}</strong></h1>
-        <hr class="divider" />
+        <div class="container text-center">
+          <h2 class="c_title mb-3"><strong>{{ category.categoryName }}</strong></h2>
+          <hr class="divider-dark" />
 
-        <table class="tg">
-          <tbody>
-          <tr v-for="disease in category.diseases" :key="disease.id">
-            <td>
-              <router-link :to="{
-                name: 'DiseaseDetail',
-                params: {
-                  // categorySlug: category.categorySlug, // 현재 카테고리의 slug
-                  diseaseId: disease.id       // 질환의 고유 ID
-                }
-              }">
-                {{ disease.diseaseName }}
-              </router-link>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+          <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li v-for="disease in category.diseases" :key="disease.id" class="list-group-item border-0">
+                  <router-link :to="{ name: 'DiseaseDetail', params: { diseaseId: disease.id }}" class="text-dark text-decoration-none disease-link">
+                    {{ disease.diseaseName }}
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </section>
-
-<!--      <div v-if="Object.keys(groupedDiseases).length === 0" class="page-section">-->
-<!--        <h1 class="c_title"><strong>검색결과 없음</strong></h1>-->
-<!--        <hr class="divider" />-->
-<!--      </div>-->
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 필요시 Masthead, 테이블 등 스타일 적용 */
+/* 질환 페이지 헤더는 전체 화면을 다 차지하지 않도록 설정 */
+.disease-header {
+  min-height: 80vh !important; /* 100vh 대신 80vh로 줄여서 밑이 보이게 함 */
+  height: auto !important;
+  padding-bottom: 5rem;
+}
+
+.divider-dark {
+  max-width: 3.25rem;
+  border: 0.15rem solid #f4623a;
+  margin: 1.5rem auto;
+  opacity: 1;
+}
+
+.disease-link:hover {
+  color: #f4623a !important;
+  font-weight: bold;
+}
+
+.c_title {
+  color: #333;
+  margin-top: 2rem;
+}
+
+/* 아이콘 이미지 반응형 */
+.h-icon img {
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.h-icon img:hover {
+  transform: scale(1.1);
+}
 </style>
