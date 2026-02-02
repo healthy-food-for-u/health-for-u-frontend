@@ -33,7 +33,7 @@ function checkId() {
     errors.loginId = '5~20자의 영문, 숫자, 특수기호(_,-)만 사용 가능합니다.'
   } else {
     // 서버에 아이디 중복 확인 요청
-    api.get(`/auth/users/check-id`, { params: { id: form.loginId } })
+    api.get(`/auth/check-id`, { params: { id: form.loginId } })
         .then(res => {
           if (res.data.exists) errors.loginId = '이미 사용 중인 아이디입니다.'
           else errors.loginId = null
