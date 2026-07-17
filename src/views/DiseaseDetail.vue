@@ -1,8 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import axios from 'axios'
-import RecipeSearchBox from "@/components/RecipeSearchBox.vue";
 import api from '@/api'
 
 const route = useRoute()
@@ -41,6 +39,9 @@ async function fetchDiseaseData() {
 async function fetchRecipes() {
   const id = route.params.diseaseId
 
+  // 이미 화면에 로드된 질병 객체에서 caution 문자열을 꺼내온다.
+  const cautionString = disease.value?.caution || "";
+
   // 20개씩 끊어서 다음 페이지를 가져오기 위한 계산
   const pageNumber = Math.floor(startIndex.value / 20);
 
@@ -48,10 +49,12 @@ async function fetchRecipes() {
     diseaseId: id,
     keyword: keyword.value,
     page: pageNumber, // 서버의 Pageable.getPageNumber()로 전달됨
-    size: 20          // 서버의 Pageable.getPageSize()로 전달됨
+    size: 20,          // 서버의 Pageable.getPageSize()로 전달됨
+    caution : cautionString
   };
 
   try {
+    console.log("params : ", params);
     const res = await api.get('/health/recipes', { params });
 
     cautionRecipes.value = res.data.content;
