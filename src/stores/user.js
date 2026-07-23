@@ -18,28 +18,24 @@ export const useUserStore = defineStore('user', {
                 this.user = null
             }
         },
+        // 강제 로그아웃/만료 시 API 호출 없이 즉시 정리하는 용도
+        clearAuth() {
+            this.user = null;
+            localStorage.removeItem('user');
+            localStorage.removeItem('accessToken');
+        },
         async logout() {
             try {
                 const token = localStorage.getItem('accessToken');
-
                 await api.post('/auth/logout', null, {
-                    headers: {
-                        // 백엔드가 기대하는 "Bearer " 포맷을 맞춰줍니다.
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-
-                // 성공 시 상태 초기화
-                this.user = null;
-                localStorage.removeItem('user');
-                localStorage.removeItem('accessToken');
-
-                await router.push('/');
             } catch (err) {
                 console.error('로그아웃 오류:', err);
-                // 에러가 나도 일단 로컬 데이터는 지우는 게 안전합니다.
-                this.user = null;
-                localStorage.removeItem('user');
+            } finally {
+                // 성공하든 실패하든 확실하게 비우기
+                this.clearAuth();
+                await router.push('/');
             }
         }
     }
