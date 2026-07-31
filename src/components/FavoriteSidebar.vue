@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/user'
 import api from '@/api'
@@ -65,9 +64,7 @@ function goToRecipe(id) {
 </template>
 
 <style scoped>
-body,
-ul,
-li {
+ul, li {
   padding: 0;
   margin: 0;
   list-style: none;
@@ -76,53 +73,79 @@ li {
 a {
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
 
+/* 사이드바 전체 컨테이너 */
 .left-side-bar {
-  background-color: gray;
-  opacity: 0.8;
-  margin-top: 10rem;
-  height: 5%;
-  width: 12rem;
   position: fixed;
-  left: -150px;
-  transition: left 0.3s;
-  overflow: auto;
-  z-index: 1;
+  top: 80px; /* 상단바 위치에 맞게 조절 */
+  left: 0;
+  width: 200px; /* 버튼과 리스트가 차지할 기본 고정 너비 */
+  z-index: 999;
 }
 
+/* "즐겨찾는 레시피" 타이틀/버튼 부분 */
 .left-side-bar > .status-ico {
-  text-align: right;
-  padding: 10px;
+  text-align: center;
+  padding: 12px;
+  font-weight: bold;
+  background-color: #555;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
+/* 즐겨찾기 목록이 버튼 바로 밑에 아래로 떨어지도록 설정 */
 .left-side-bar ul {
-  font-weight: bold;
-  text-align: center;
-  padding: 0;
+  display: none; /* 평소엔 숨김 */
+  position: absolute;
+  top: 100%; /* 버튼 바로 아래에 위치 */
+  left: 0;   /* 버튼 왼쪽 라인에 딱 맞춤 */
+  width: 100%; /* 버튼 너비와 똑같이 맞춤 (원하면 더 넓게 지정해도 됨) */
+  background-color: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  margin-top: 4px; /* 버튼과의 살짝 간격 */
+
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* 마우스를 올렸을 때 ul을 보여줌 */
+.left-side-bar:hover ul {
+  display: block;
+}
+
+/* 개별 레시피 항목 스타일 */
+.left-side-bar ul > li {
+  border-bottom: 1px solid #eee;
+}
+
+.left-side-bar ul > li:last-child {
+  border-bottom: none;
 }
 
 .left-side-bar ul > li > a {
-  display: block;
-  padding: 10px;
-  white-space: nowrap;
-}
-
-.left-side-bar:hover {
-  left: 0;
-  opacity: 1;
-  height: 90%;
-  margin-top: 4.6rem;
-  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  text-align: center;
 }
 
 .left-side-bar ul > li:hover > a {
-  color: black;
-  background-color: lightgray;
+  background-color: #f9f9f9;
+  color: #333;
 }
 
+/* 썸네일 이미지 크기 고정 */
 .left-side-bar ul > li img {
-  width: 100px;
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
   border-radius: 6px;
+  margin-bottom: 6px;
 }
 </style>

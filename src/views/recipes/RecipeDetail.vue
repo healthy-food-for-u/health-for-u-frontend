@@ -1,7 +1,6 @@
 <script setup>
 import {ref, onMounted, computed, watch} from "vue";
-import axios from "axios";
-import {RouterLink, useRoute, useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import NavigationBar from "@/components/NavigationBar.vue";
 import { useUserStore } from '@/stores/user';
 import api from '@/api';
@@ -111,8 +110,10 @@ const addFavorite = async () => {
   try {
     const res = await api.post(`/health/favorites/toggle`, null, {
       params: {
-        userId: userId,
         recipeId: recipeId
+      },
+      headers: {
+        'X-User-Id': userId
       },
       withCredentials: true
     });
